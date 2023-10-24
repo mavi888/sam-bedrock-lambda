@@ -3,3 +3,5 @@ invoke.txt
 samconfig.toml
 response.json
 .vscode/settings.json
+node_modules/
+src/package-lock.json

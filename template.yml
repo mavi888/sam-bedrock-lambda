@@ -15,3 +15,17 @@ Resources:
             - Effect: Allow
               Action: 'bedrock:*'
               Resource: '*'
+
+  GenerateCatStoryJavascriptFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: lambdaJavascript.handler
+      Runtime: nodejs18.x
+      MemorySize: 128
+      Timeout: 600
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: 'bedrock:*'
+              Resource: '*'
