@@ -25,7 +25,7 @@ exports.handler = awslambda.streamifyResponse(
 		console.log(input);
 
 		const command = new InvokeModelWithResponseStreamCommand(input);
-		data = await client.send(command);
+		console.log('d');
 
 		/*const requestStream = Readable.from(
 			Buffer.from(new Array(1024 * 1024).join('🚣'))
@@ -33,8 +33,15 @@ exports.handler = awslambda.streamifyResponse(
 
 		//		let eventStream = data.body;
 		//	console.log(eventStream);
-		const requestStream = Readable.from(data.body);
-
-		await pipeline(requestStream, responseStream);
+		try {
+			data = await client.send(command);
+			console.log('a');
+			const requestStream = Readable.from(data.body);
+			console.log('b');
+			await pipeline(requestStream, responseStream);
+		} catch (error) {
+			console.log('c');
+			console.log(error);
+		}
 	}
 );
