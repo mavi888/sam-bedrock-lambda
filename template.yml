@@ -30,7 +30,7 @@ Resources:
               Action: 'bedrock:*'
               Resource: '*'
 
-  StreamingFunction:
+  NewStreamingFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/
@@ -46,6 +46,6 @@ Resources:
   MyFunctionUrl:
     Type: AWS::Lambda::Url
     Properties:
-      TargetFunctionArn: !Ref StreamingFunction
+      TargetFunctionArn: !Ref NewStreamingFunction
       AuthType: AWS_IAM
       InvokeMode: RESPONSE_STREAM

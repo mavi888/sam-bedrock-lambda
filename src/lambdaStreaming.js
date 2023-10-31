@@ -8,40 +8,38 @@ const {
 	InvokeModelWithResponseStreamCommand,
 } = require('@aws-sdk/client-bedrock-runtime'); // ES Modules import
 
-const client = new BedrockRuntimeClient();
+const bedrock = new BedrockRuntimeClient({ region: 'us-east-1' });
+
+function parseBase64(message) {
+	return JSON.parse(Buffer.from(message, 'base64').toString('utf-8'));
+}
 
 exports.handler = awslambda.streamifyResponse(
 	async (event, responseStream, _context) => {
-		const PROMPT =
-			'Can you write a story that is 20 paragraphs long about a cat in space. The story should be funny and have a begining, middle, and end. The story should be funny to a 10 year old.';
+		const PROMPT = 'Explain serverless to a 5th grader.';
+		const claudPrompt = `Human: Human:${PROMPT} Assistant:`;
 
-		const input = {
-			modelId: 'cohere.command-text-v14',
+		const params = {
+			modelId: 'anthropic.claude-v2',
 			contentType: 'application/json',
 			accept: '*/*',
-			body: `{"prompt":"${PROMPT}","max_tokens":2149,"temperature":0.75,"p":0.01,"k":0,"stop_sequences":[],"return_likelihoods":"NONE"}`,
+			body: `{"prompt":"${claudPrompt}","max_tokens_to_sample":2048,"temperature":0.5,"top_k":250,"top_p":0.5,"stop_sequences":[], "anthropic_version":"bedrock-2023-05-31"}`,
 		};
 
-		console.log(input);
+		console.log(params);
 
-		const command = new InvokeModelWithResponseStreamCommand(input);
-		console.log('d');
+		const command = new InvokeModelWithResponseStreamCommand(params);
 
-		/*const requestStream = Readable.from(
-			Buffer.from(new Array(1024 * 1024).join('🚣'))
-		);*/
+		const response = await bedrock.send(command);
+		const chunks = [];
 
-		//		let eventStream = data.body;
-		//	console.log(eventStream);
-		try {
-			data = await client.send(command);
-			console.log('a');
-			const requestStream = Readable.from(data.body);
-			console.log('b');
-			await pipeline(requestStream, responseStream);
-		} catch (error) {
-			console.log('c');
-			console.log(error);
+		for await (const chunk of response.body) {
+			const parsed = parseBase64(chunk.chunk.bytes);
+			chunks.push(parsed.completion);
+			responseStream.write(parsed.completion);
 		}
+
+		console.log(chunks.join(''));
+		responseStream.end();
 	}
 );
