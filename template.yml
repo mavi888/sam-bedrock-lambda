@@ -29,3 +29,23 @@ Resources:
             - Effect: Allow
               Action: 'bedrock:*'
               Resource: '*'
+
+  NewStreamingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: lambdaStreaming.handler
+      Runtime: nodejs18.x
+      Timeout: 30
+      MemorySize: 256
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: 'bedrock:*'
+              Resource: '*'
+  MyFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !Ref NewStreamingFunction
+      AuthType: AWS_IAM
+      InvokeMode: RESPONSE_STREAM
