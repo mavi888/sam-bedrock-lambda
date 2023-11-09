@@ -16,7 +16,7 @@ function parseBase64(message) {
 
 exports.handler = awslambda.streamifyResponse(
 	async (event, responseStream, _context) => {
-		const PROMPT = 'Explain serverless to a 5th grader.';
+		const PROMPT = 'Explain to a prescholer what is cloud computing.';
 		const claudPrompt = `Human: Human:${PROMPT} Assistant:`;
 
 		const params = {
